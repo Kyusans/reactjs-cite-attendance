@@ -22,7 +22,7 @@ export const Login = () => {
       if(res.data !== 0){
         toast.success("Login Success");
         setTimeout(() => {
-          navigateTo("/dashboard");
+          navigateTo("/faculty/dashboard");
         }, 1500);
       }else{
         toast.error("Invalid Credentials");
@@ -65,7 +65,7 @@ export const Login = () => {
             </Form.Group>
 
             <div className="d-grid mb-3">
-              <Button variant="primary" type="submit" disabled={isLoading}>
+              <Button variant="outline-dark" type="submit" disabled={isLoading}>
                 {isLoading && (<Spinner className='me-2' size="sm" as={"span"} />)}
                 Login
               </Button>
