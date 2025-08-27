@@ -28,7 +28,7 @@ export const Login = () => {
         toast.error("Invalid Credentials");
       }
     } catch (error) {
-      toast.success("Network Error");
+      toast.error("Network Error");
       console.log("Login.jsx => handleLogin(): ", error);
     } finally {
       setIsLoading(false);
@@ -48,24 +48,23 @@ export const Login = () => {
   };
   return (
     <Container className="d-flex justify-content-center align-items-center vh-100">
-      <Card>
-        <Card.Body className="p-4">
+      <Card className='border-2 border-black shadow'>
+        <Card.Body className="p-5">
           <Form noValidate validated={validated} onSubmit={handleSubmit}>
-            <h4 className="text-center mb-4 fw-bold">Welcome Back</h4>
+            <h2 className="text-center mb-4 fw-bold">Welcome Back</h2>
 
             <Form.Group className="mb-3">
-              <Form.Label >Email</Form.Label>
+              <Form.Label>Email</Form.Label>
               <Form.Control type="text" id='email' placeholder="name@example.com" required />
             </Form.Group>
 
             <Form.Group className="mb-3">
               <Form.Label>Password</Form.Label>
               <Form.Control type="password" id='password' required />
-
             </Form.Group>
 
-            <div className="d-grid mb-3">
-              <Button variant="outline-dark" type="submit" disabled={isLoading}>
+            <div className="d-grid mb-3 mt-4">
+              <Button variant="outline-dark" type="submit" size="lg" disabled={isLoading}>
                 {isLoading && (<Spinner className='me-2' size="sm" as={"span"} />)}
                 Login
               </Button>
