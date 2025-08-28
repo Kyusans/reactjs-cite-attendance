@@ -1,10 +1,11 @@
 import axios from 'axios';
 import React, { useEffect } from 'react'
-import { Badge, Button, Container, Nav, Navbar } from 'react-bootstrap';
+import { Badge, Button, Container, Nav, Navbar, NavbarText } from 'react-bootstrap';
 import { toast } from 'sonner';
 import DataTable from '../components/DataTable';
 import { LoadingSpinner } from '../components/LoadingSpinner';
 import { Login } from './Login';
+import { Menu } from 'lucide-react';
 
 export const LandingPage = () => {
   const [data, setData] = React.useState([]);
@@ -48,14 +49,42 @@ export const LandingPage = () => {
   return (
     <>
       <Navbar bg="dark" expand="lg" className="mb-3">
-        <Navbar.Brand className='text-white ms-3'>CITE</Navbar.Brand>
-        <Navbar.Toggle aria-controls="basic-navbar-nav" />
-        <Navbar.Collapse className="justify-content-end">
-          <Nav.Link className="text-white me-3" onClick={handleOpenLoginModal} style={{ cursor: 'pointer' }}>
-            Login
-          </Nav.Link>
+        <Navbar.Brand className="ms-3 text-white">CITE</Navbar.Brand>
+        <Button
+          size='sm'
+          className='rounded-3 d-lg-none'
+          aria-controls="basic-navbar-nav"
+          aria-expanded={false}
+          onClick={() => {
+            const collapse = document.getElementById('basic-navbar-nav')
+            collapse?.classList.toggle('show')
+          }}
+          style={{
+            backgroundColor: '#212529',
+            borderColor: 'white',
+            color: 'white',
+            padding: '6px 10px',
+            borderRadius: '4px',
+            marginRight: '1rem'
+          }}
+        >
+          <Menu color="white" />
+        </Button>
+
+        <Navbar.Collapse id="basic-navbar-nav" className="justify-content-end">
+          <Nav className="ms-auto">
+            <Nav.Link
+              className="text-white me-3"
+              onClick={handleOpenLoginModal}
+              style={{ cursor: 'pointer' }}
+            >
+              Login
+            </Nav.Link>
+          </Nav>
         </Navbar.Collapse>
       </Navbar>
+
+
       <Container className='mt-3'>
         {isLoading ? (
           <LoadingSpinner />

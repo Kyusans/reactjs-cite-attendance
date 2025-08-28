@@ -1,15 +1,14 @@
 import { Toaster } from "sonner";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import { Login } from "./pages/Login";
-import { FacultyDashboard } from "./pages/Faculty/FacultyDashboard";
 import { LandingPage } from "./pages/LandingPage";
+import { FacultyDashboard } from "./pages/Faculty/FacultyDashboard";
 
 
 function App() {
 
 
   return (
-    <div className="text-white bg-zinc-800">
+    <div>
       <Toaster richColors position='top-right' duration={1500} />
       <BrowserRouter>
         <Routes>

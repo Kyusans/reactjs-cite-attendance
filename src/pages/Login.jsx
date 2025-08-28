@@ -1,8 +1,9 @@
 import axios from 'axios';
 import React, { useState } from 'react'
-import { Button, Card, Container, Form, Modal, Spinner } from "react-bootstrap";
+import { Button, Container, Form, Modal, Spinner } from "react-bootstrap";
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
+import { storeData } from '../utils/cryptoUtils';
 export const Login = ({ show, onHide }) => {
   const [validated, setValidated] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -21,6 +22,7 @@ export const Login = ({ show, onHide }) => {
       console.log("res ni handleLogin", res);
       if (res.data !== 0) {
         toast.success("Login Success");
+        storeData("userId", res.data.user_id);
         setTimeout(() => {
           navigateTo("/faculty/dashboard");
         }, 1500);
@@ -79,11 +81,6 @@ export const Login = ({ show, onHide }) => {
           </Modal.Footer>
         </Form>
       </Modal>
-      {/* <Card className='border-2 border-black shadow'>
-        <Card.Body className="p-5">
-         
-        </Card.Body>
-      </Card> */}
     </Container >
   )
 }

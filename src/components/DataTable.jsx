@@ -1,5 +1,5 @@
 import { ChevronsUpDown } from "lucide-react";
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useMemo } from "react";
 import { Table, Form, Pagination } from "react-bootstrap";
 
 const DataTable = ({
