@@ -1,9 +1,9 @@
 import axios from 'axios';
 import React, { useState } from 'react'
-import { Button, Card, Container, Form, Spinner } from "react-bootstrap";
+import { Button, Card, Container, Form, Modal, Spinner } from "react-bootstrap";
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-export const Login = () => {
+export const Login = ({ show, onHide }) => {
   const [validated, setValidated] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const navigateTo = useNavigate();
@@ -19,12 +19,12 @@ export const Login = () => {
       formData.append("operation", "login");
       const res = await axios.post(url, formData);
       console.log("res ni handleLogin", res);
-      if(res.data !== 0){
+      if (res.data !== 0) {
         toast.success("Login Success");
         setTimeout(() => {
           navigateTo("/faculty/dashboard");
         }, 1500);
-      }else{
+      } else {
         toast.error("Invalid Credentials");
       }
     } catch (error) {
@@ -46,13 +46,18 @@ export const Login = () => {
 
     setValidated(true);
   };
-  return (
-    <Container className="d-flex justify-content-center align-items-center vh-100">
-      <Card className='border-2 border-black shadow'>
-        <Card.Body className="p-5">
-          <Form noValidate validated={validated} onSubmit={handleSubmit}>
-            <h2 className="text-center mb-4 fw-bold">Welcome Back</h2>
 
+  const handleClose = () => {
+    onHide();
+  }
+  return (
+    <Container>
+      <Modal show={show} onHide={handleClose} centered>
+        <Form noValidate validated={validated} onSubmit={handleSubmit}>
+          <Modal.Header closeButton>
+            <Modal.Title>Sign in</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
             <Form.Group className="mb-3">
               <Form.Label>Email</Form.Label>
               <Form.Control type="text" id='email' placeholder="name@example.com" required />
@@ -62,16 +67,23 @@ export const Login = () => {
               <Form.Label>Password</Form.Label>
               <Form.Control type="password" id='password' required />
             </Form.Group>
-
-            <div className="d-grid mb-3 mt-4">
-              <Button variant="outline-dark" type="submit" size="lg" disabled={isLoading}>
-                {isLoading && (<Spinner className='me-2' size="sm" as={"span"} />)}
-                Login
-              </Button>
-            </div>
-          </Form>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="outline-danger" size="sm" onClick={handleClose}>
+              Close
+            </Button>
+            <Button variant="outline-success" type="submit" size="sm" disabled={isLoading}>
+              {isLoading && (<Spinner className='me-2' size="sm" as={"span"} />)}
+              Login
+            </Button>
+          </Modal.Footer>
+        </Form>
+      </Modal>
+      {/* <Card className='border-2 border-black shadow'>
+        <Card.Body className="p-5">
+         
         </Card.Body>
-      </Card>
-    </Container>
+      </Card> */}
+    </Container >
   )
 }

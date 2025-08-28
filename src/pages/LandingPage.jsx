@@ -1,13 +1,18 @@
 import axios from 'axios';
 import React, { useEffect } from 'react'
-import { Badge, Container } from 'react-bootstrap';
+import { Badge, Button, Container, Nav, Navbar } from 'react-bootstrap';
 import { toast } from 'sonner';
 import DataTable from '../components/DataTable';
 import { LoadingSpinner } from '../components/LoadingSpinner';
+import { Login } from './Login';
 
 export const LandingPage = () => {
   const [data, setData] = React.useState([]);
   const [isLoading, setIsLoading] = React.useState(false);
+
+  const [loginModalShow, setLoginModalShow] = React.useState(false);
+  const handleOpenLoginModal = () => setLoginModalShow(true);
+  const handleCloseLoginModal = () => setLoginModalShow(false);
 
   const getTodayFacultySchedules = async () => {
     setIsLoading(true);
@@ -41,12 +46,25 @@ export const LandingPage = () => {
     },
   ]
   return (
-    <Container className='mt-3'>
-      {isLoading ? (
-        <LoadingSpinner />
-      ) :
-        <DataTable columns={columns} data={data} itemsPerPage={10} autoIndex />
-      }
-    </Container>
+    <>
+      <Navbar bg="dark" expand="lg" className="mb-3">
+        <Navbar.Brand className='text-white ms-3'>CITE</Navbar.Brand>
+        <Navbar.Toggle aria-controls="basic-navbar-nav" />
+        <Navbar.Collapse className="justify-content-end">
+          <Nav.Link className="text-white me-3" onClick={handleOpenLoginModal} style={{ cursor: 'pointer' }}>
+            Login
+          </Nav.Link>
+        </Navbar.Collapse>
+      </Navbar>
+      <Container className='mt-3'>
+        {isLoading ? (
+          <LoadingSpinner />
+        ) :
+          <DataTable columns={columns} data={data} itemsPerPage={10} autoIndex />
+        }
+        <Login show={loginModalShow} onHide={handleCloseLoginModal} />
+      </Container>
+    </>
+
   )
 }
