@@ -8,12 +8,12 @@ const DataTable = ({
   itemsPerPage = 10,
   autoIndex = false,
   title,
-  add,
   hideSearch = false,
   onRowClick,
   idAccessor,
   isSelectable = false,
   selectedData,
+  headerAction, // ✅ new prop
 }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
@@ -112,7 +112,10 @@ const DataTable = ({
     <div>
       {/* Header */}
       <div className="d-flex justify-content-between align-items-center mb-3">
-        {title && <h4>{title}</h4>}
+        <div className="d-flex align-items-center gap-2">
+          {title && <h4 className="mb-0">{title}</h4>}
+          {headerAction && <div>{headerAction}</div>} {/* ✅ render here */}
+        </div>
         {!hideSearch && data.length > 0 && (
           <Form.Control
             type="text"
@@ -125,7 +128,7 @@ const DataTable = ({
       </div>
 
       {/* Table */}
-      <Table responsive bordered hover >
+      <Table responsive bordered hover>
         <thead>
           <tr>
             {isSelectable && (
@@ -145,7 +148,7 @@ const DataTable = ({
                 onClick={() => column.sortable && handleSort(column.accessor)}
               >
                 {column.header}
-                {column.sortable && <ChevronsUpDown className="h-4 w-4" />}
+                {column.sortable && <ChevronsUpDown size={16} />}
               </th>
             ))}
           </tr>
