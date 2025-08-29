@@ -1,4 +1,4 @@
-import { Badge, Button, Card, Container, Form } from "react-bootstrap"
+import { Badge, Card, Container, Form } from "react-bootstrap"
 import { FacultyNavbar } from "./FacultyNavbar"
 import { useEffect, useState } from "react";
 import { retrieveData } from "../../utils/cryptoUtils";
@@ -13,9 +13,9 @@ import ChangeStatusAlert from "./modal/ChangeStatusAlert";
 export const FacultyDashboard = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [data, setData] = useState([]);
+  const [facultyStatus, setFacultyStatus] = useState(null);
   const [filteredData, setFilteredData] = useState([]);
   const [statusSwitch, setStatusSwitch] = useState(true);
-
 
   const [filterDay, setFilterDay] = useState("All");
 
@@ -44,24 +44,35 @@ export const FacultyDashboard = () => {
     setShowAlert(false);
   };
 
-
   const handleShowSwitchStatusAlert = (value) => {
     setSelectedStatus(value);
     handleShowAlert("You want to change the status?");
   };
 
   const handleChangeStatus = async (notes) => {
-    console.log("status", selectedStatus);
-    const url = process.env.REACT_APP_API_URL + "admin.php";
-    const userId = retrieveData("userId");
-    const jsonData = { userId: userId, status: selectedStatus, notes: selectedStatus === 1 ? "In Office" : notes }
-    const formData = new FormData();
-    formData.append("json", JSON.stringify(jsonData));
-    formData.append("operation", "changeFacultyStatus");
-    const res = await axios.post(url, formData);
-    console.log("res ni handleChangeStatus", res);
-  };
+    setIsLoading(true);
+    try {
+      console.log("status", selectedStatus);
+      const url = process.env.REACT_APP_API_URL + "admin.php";
+      const userId = retrieveData("userId");
+      const jsonData = { userId: userId, status: selectedStatus, notes: selectedStatus === 1 ? "In Office" : notes }
+      const formData = new FormData();
+      formData.append("json", JSON.stringify(jsonData));
+      formData.append("operation", "changeFacultyStatus");
+      const res = await axios.post(url, formData);
+      console.log("res ni handleChangeStatus", res);
 
+      if (res.data !== 0) {
+        toast.success("Status successfully changed");
+        getFacultySchedules();
+      }
+    } catch (error) {
+      toast.error("Network Error");
+      console.log("FacultyDashboard => handleChangeStatus(): ", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const getFacultySchedules = async () => {
     setIsLoading(true);
@@ -73,8 +84,19 @@ export const FacultyDashboard = () => {
       formData.append("json", JSON.stringify(jsonData));
       formData.append("operation", "getFacultySchedule");
       const res = await axios.post(url, formData);
-      setData(res.data !== 0 ? res.data : []);
-      setFilteredData(res.data !== 0 ? res.data : []);
+      console.log("res ni getFacultySchedules", res);
+
+      const response = res.data;
+      setData(response.schedules !== 0 ? response.schedules : []);
+      setFilteredData(response.schedules !== 0 ? response.schedules : []);
+
+      const status = response.status !== 0 ? response.status[0] : null;
+      setFacultyStatus(status);
+
+      if (status) {
+        setStatusSwitch(status.facStatus_statusMId === 1);
+      }
+
     } catch (error) {
       toast.error("Network Error");
       console.log("FacultyDashboard => getFacultySchedules(): ", error);
@@ -103,7 +125,6 @@ export const FacultyDashboard = () => {
     getFacultySchedules();
   }, [])
 
-
   return (
     <>
       <FacultyNavbar />
@@ -111,16 +132,26 @@ export const FacultyDashboard = () => {
         <Container>
           {isLoading ? <LoadingSpinner /> :
             <>
-              <Card style={{ width: '12rem' }} className="mb-3 shadow-sm rounded-4">
+              <Card className="mb-3 shadow-sm rounded-4">
                 <Card.Body>
-                  <div className="d-flex align-items-center">
-                    <Form.Check
-                      type="switch"
-                      checked={statusSwitch}
-                      onChange={() => handleShowSwitchStatusAlert(!statusSwitch ? 1 : 2)}
-                    />
-                    <Badge bg="success">Status: Active</Badge>
-                  </div>
+                  {facultyStatus && (
+                    <div className="d-flex align-items-center">
+                      <Form.Check
+                        type="switch"
+                        checked={statusSwitch}
+                        onChange={() => handleShowSwitchStatusAlert(!statusSwitch ? 1 : 2)}
+                      />
+                      <Badge bg={
+                        facultyStatus.facStatus_statusMId === 2
+                          ? "danger"
+                          : facultyStatus.facStatus_statusMId === 3
+                            ? "warning"
+                            : "success"
+                      } className="ms-2">
+                        {`Status: ${facultyStatus.facStatus_note} ${facultyStatus.facStatus_statusMId === 2 ? "(Out)" : ""}`}
+                      </Badge>
+                    </div>
+                  )}
                 </Card.Body>
               </Card>
               <Card className="rounded-4">
