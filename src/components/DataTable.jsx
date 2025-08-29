@@ -154,40 +154,49 @@ const DataTable = ({
           </tr>
         </thead>
         <tbody>
-          {currentItems.map((row, rowIndex) => {
-            const rowIdentifier = idAccessor ? row[idAccessor] : row;
-            return (
-              <tr
-                key={rowIndex}
-                onClick={() => onRowClick && onRowClick(rowIdentifier)}
-                style={{ cursor: onRowClick ? "pointer" : "default" }}
-              >
-                {isSelectable && (
-                  <td>
-                    <Form.Check
-                      type="checkbox"
-                      checked={selectedRows.has(rowIdentifier)}
-                      onChange={() => handleRowSelect(rowIdentifier)}
-                      onClick={(e) => e.stopPropagation()}
-                    />
-                  </td>
-                )}
-                {autoIndex && (
-                  <td>{(currentPage - 1) * itemsPerPage + rowIndex + 1}</td>
-                )}
-                {columns.map((column, colIndex) => (
-                  <td key={colIndex}>
-                    {column.cell
-                      ? column.cell(row)
-                      : typeof column.accessor === "function"
-                        ? column.accessor(row)
-                        : row[column.accessor]}
-                  </td>
-                ))}
-              </tr>
-            );
-          })}
+          {currentItems.length > 0 ? (
+            currentItems.map((row, rowIndex) => {
+              const rowIdentifier = idAccessor ? row[idAccessor] : row;
+              return (
+                <tr
+                  key={rowIndex}
+                  onClick={() => onRowClick && onRowClick(rowIdentifier)}
+                  style={{ cursor: onRowClick ? "pointer" : "default" }}
+                >
+                  {isSelectable && (
+                    <td>
+                      <Form.Check
+                        type="checkbox"
+                        checked={selectedRows.has(rowIdentifier)}
+                        onChange={() => handleRowSelect(rowIdentifier)}
+                        onClick={(e) => e.stopPropagation()}
+                      />
+                    </td>
+                  )}
+                  {autoIndex && (
+                    <td>{(currentPage - 1) * itemsPerPage + rowIndex + 1}</td>
+                  )}
+                  {columns.map((column, colIndex) => (
+                    <td key={colIndex}>
+                      {column.cell
+                        ? column.cell(row)
+                        : typeof column.accessor === "function"
+                          ? column.accessor(row)
+                          : row[column.accessor]}
+                    </td>
+                  ))}
+                </tr>
+              );
+            })
+          ) : (
+            <tr>
+              <td colSpan={columns.length + (isSelectable ? 1 : 0) + (autoIndex ? 1 : 0)} className="text-center">
+                No data found
+              </td>
+            </tr>
+          )}
         </tbody>
+
       </Table>
 
       {/* Pagination */}

@@ -1,6 +1,6 @@
 import axios from 'axios';
 import React, { useEffect } from 'react'
-import { Badge, Button, Container, Nav, Navbar, NavbarText } from 'react-bootstrap';
+import { Badge, Button, Container, Nav, Navbar } from 'react-bootstrap';
 import { toast } from 'sonner';
 import DataTable from '../components/DataTable';
 import { LoadingSpinner } from '../components/LoadingSpinner';
@@ -89,7 +89,7 @@ export const LandingPage = () => {
         {isLoading ? (
           <LoadingSpinner />
         ) :
-          <DataTable columns={columns} data={data} itemsPerPage={10} autoIndex />
+          <DataTable title={"Today's Faculty Schedule"} columns={columns} data={data} itemsPerPage={10} autoIndex />
         }
         <Login show={loginModalShow} onHide={handleCloseLoginModal} />
       </Container>

@@ -1,10 +1,14 @@
 import { LogOut, Settings } from "lucide-react"
 import { Dropdown, Navbar } from "react-bootstrap"
 import { useNavigate } from "react-router-dom";
+import { removeData } from "../../utils/cryptoUtils";
 
 export const FacultyNavbar = () => {
   const navigateTo = useNavigate();
-  const handleLogout = () => navigateTo("/");
+  const handleLogout = () => {
+    navigateTo("/");
+    removeData("userId");
+  };
 
   return (
     <Navbar bg="dark" expand="lg" className="mb-3">
