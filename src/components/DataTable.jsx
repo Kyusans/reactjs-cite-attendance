@@ -111,17 +111,19 @@ const DataTable = ({
   return (
     <div>
       {/* Header */}
-      <div className="d-flex justify-content-between align-items-center mb-3">
+      <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-3 gap-2">
         <div className="d-flex align-items-center gap-2">
           {title && <h4 className="mb-0">{title}</h4>}
-          {headerAction && <div>{headerAction}</div>} {/* ✅ render here */}
+          {headerAction && <div>{headerAction}</div>}
         </div>
+
         {!hideSearch && data.length > 0 && (
           <Form.Control
             type="text"
             placeholder="Search..."
             value={searchTerm}
             onChange={handleSearch}
+            className="w-100 w-md-auto" 
             style={{ maxWidth: "250px" }}
           />
         )}

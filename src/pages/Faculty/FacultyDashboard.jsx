@@ -1,4 +1,4 @@
-import { Card, Container, Form } from "react-bootstrap"
+import { Badge, Button, Card, Container, Form } from "react-bootstrap"
 import { FacultyNavbar } from "./FacultyNavbar"
 import { useEffect, useState } from "react";
 import { retrieveData } from "../../utils/cryptoUtils";
@@ -8,11 +8,14 @@ import { LoadingSpinner } from "../../components/LoadingSpinner";
 import DataTable from "../../components/DataTable";
 import { AddSchedule } from "./modal/AddSchedule";
 import { PlusSquare } from "lucide-react";
+import ChangeStatusAlert from "./modal/ChangeStatusAlert";
 
 export const FacultyDashboard = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [data, setData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
+  const [statusSwitch, setStatusSwitch] = useState(true);
+
 
   const [filterDay, setFilterDay] = useState("All");
 
@@ -22,6 +25,43 @@ export const FacultyDashboard = () => {
     getFacultySchedules();
     setShowAddSched(false)
   };
+
+  const [alertMessage, setAlertMessage] = useState("");
+  const [showAlert, setShowAlert] = useState(false);
+  const [selectedStatus, setSelectedStatus] = useState(null);
+
+  const handleShowAlert = (message) => {
+    setAlertMessage(message);
+    setShowAlert(true);
+  };
+
+  const handleCloseAlert = (confirmed, notes) => {
+    if (confirmed === 1) {
+      setStatusSwitch(selectedStatus === 1);
+      handleChangeStatus(notes);
+      console.log("Confirmed! Notes:", notes);
+    }
+    setShowAlert(false);
+  };
+
+
+  const handleShowSwitchStatusAlert = (value) => {
+    setSelectedStatus(value);
+    handleShowAlert("You want to change the status?");
+  };
+
+  const handleChangeStatus = async (notes) => {
+    console.log("status", selectedStatus);
+    const url = process.env.REACT_APP_API_URL + "admin.php";
+    const userId = retrieveData("userId");
+    const jsonData = { userId: userId, status: selectedStatus, notes: selectedStatus === 1 ? "In Office" : notes }
+    const formData = new FormData();
+    formData.append("json", JSON.stringify(jsonData));
+    formData.append("operation", "changeFacultyStatus");
+    const res = await axios.post(url, formData);
+    console.log("res ni handleChangeStatus", res);
+  };
+
 
   const getFacultySchedules = async () => {
     setIsLoading(true);
@@ -63,24 +103,34 @@ export const FacultyDashboard = () => {
     getFacultySchedules();
   }, [])
 
+
   return (
     <>
       <FacultyNavbar />
       <main>
         <Container>
-          <Card className="rounded-4">
-            <Card.Body>
-              {isLoading ? (
-                <LoadingSpinner />
-              ) : (
-                <>
+          {isLoading ? <LoadingSpinner /> :
+            <>
+              <Card style={{ width: '12rem' }} className="mb-3 shadow-sm rounded-4">
+                <Card.Body>
+                  <div className="d-flex align-items-center">
+                    <Form.Check
+                      type="switch"
+                      checked={statusSwitch}
+                      onChange={() => handleShowSwitchStatusAlert(!statusSwitch ? 1 : 2)}
+                    />
+                    <Badge bg="success">Status: Active</Badge>
+                  </div>
+                </Card.Body>
+              </Card>
+              <Card className="rounded-4">
+                <Card.Body>
                   <DataTable
                     title="Schedule"
                     data={filteredData}
                     columns={columns}
                     headerAction={
                       <div className="d-flex">
-                        {/* Add Button */}
                         <PlusSquare
                           size={20}
                           className="cursor-pointer text-success"
@@ -101,10 +151,11 @@ export const FacultyDashboard = () => {
                       </div>
                     }
                   />
-                </>
-              )}
-            </Card.Body>
-          </Card>
+                </Card.Body>
+              </Card>
+            </>
+          }
+          <ChangeStatusAlert open={showAlert} onHide={handleCloseAlert} duration={1} message={alertMessage} status={selectedStatus} />
           <AddSchedule open={showAddSched} onHide={handleCloseAddSched} />
         </Container>
       </main>
