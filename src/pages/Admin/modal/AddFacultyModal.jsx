@@ -1,12 +1,27 @@
 import axios from 'axios';
 import React, { useState } from 'react'
-import { Modal, Form, Button, Spinner } from 'react-bootstrap'
+import { Modal, Form, Button, Spinner, Image } from 'react-bootstrap'
 import { toast } from 'sonner';
 
 export const AddFacultyModal = ({ show, onHide }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [validated, setValidated] = useState(false);
 
+  const [image, setImage] = useState(null);
+  const [imagePreview, setImagePreview] = useState("/emptyImage.jpg");
+
+  const handleImageChange = (e) => {
+    console.log(e.target.files);
+    const selectedImage = e.target.files[0];
+    if (selectedImage) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImage(selectedImage);
+        setImagePreview(reader.result);
+      };
+      reader.readAsDataURL(selectedImage);
+    }
+  };
   const handleSubmit = async (e) => {
     e.preventDefault();
     const form = e.currentTarget;
@@ -29,12 +44,14 @@ export const AddFacultyModal = ({ show, onHide }) => {
 
     try {
       const jsonData = {
-        "firstName": firstName,
-        "middleName": middleName,
-        "lastName": lastName,
-        "email": email,
-        "schoolId": schoolId,
-        "password": password
+        firstName,
+        middleName,
+        lastName,
+        email,
+        schoolId,
+        password,
+        // 👇 fallback if no image uploaded
+        image: image ? image.name : "emptyImage.jpg"
       };
 
       const url = process.env.REACT_APP_API_URL + "admin.php";
@@ -42,16 +59,31 @@ export const AddFacultyModal = ({ show, onHide }) => {
       formData.append("json", JSON.stringify(jsonData));
       formData.append("operation", "addFaculty");
 
-      const res = await axios.post(url, formData);
+      // only append file if user selected one
+      if (image) {
+        formData.append("file", image);
+      }
+
+      const res = await axios.post(url, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data"
+        }
+      });
+
       console.log("res ni handleLogin", res);
-      if (res.data === -1) {
+      if (res.data === 2) {
+        toast.error("You cannot Upload files of this type!");
+      } else if (res.data === 3) {
+        toast.error("There was an error uploading your file!");
+      } else if (res.data === 4) {
+        toast.error("Your file is too big (25mb maximum)");
+      } else if (res.data === -1) {
         toast.error("Email already exists");
       } else if (res.data === -2) {
         toast.error("School ID exist");
-      }
-      else if (res.data === 1) {
+      } else if (res.data === 1) {
         toast.success("Faculty added successfully");
-        // onHide();
+        onHide();
       } else {
         toast.error("Network Error");
       }
@@ -63,10 +95,13 @@ export const AddFacultyModal = ({ show, onHide }) => {
   };
 
 
+
   const handleClose = () => {
     onHide();
     setIsLoading(false);
     setValidated(false);
+    setImage(null);
+    setImagePreview("/emptyImage.jpg");
   }
 
 
@@ -77,6 +112,37 @@ export const AddFacultyModal = ({ show, onHide }) => {
           <Modal.Title>Add Faculty</Modal.Title>
         </Modal.Header>
         <Modal.Body>
+          <Form.Group className="d-flex flex-column align-items-center">
+            <Image
+              src={imagePreview}
+              className="mb-2"
+              roundedCircle
+              style={{
+                width: "150px",
+                height: "150px",
+                objectFit: "cover"
+              }}
+            />
+
+            <Form.Control
+              type="file"
+              accept="image/*"
+              onChange={handleImageChange}
+              id="facultyImageUpload"
+              style={{ display: "none" }}
+            />
+
+            <Button
+              variant="outline-primary"
+              onClick={() => document.getElementById("facultyImageUpload").click()}
+            >
+              {image ? "Change Image" : "Upload Image"}
+            </Button>
+          </Form.Group>
+
+
+
+
           <Form.Group>
             <Form.Label>First Name<span className='text-danger'>*</span></Form.Label>
             <Form.Control type="text" id="firstName" required />
