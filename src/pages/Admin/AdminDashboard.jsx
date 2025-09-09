@@ -1,25 +1,83 @@
-import React, { useState } from 'react'
-import { Button, Container } from 'react-bootstrap'
+import React, { useEffect, useState } from 'react'
+import { Button, Card, Col, Container, Row, Spinner } from 'react-bootstrap'
 import { AddFacultyModal } from './modal/AddFacultyModal';
+import { AdminNavbar } from './AdminNavbar';
+import axios from 'axios';
+import { toast } from 'sonner';
 
 export const AdminDashboard = () => {
+  const [isLoading, setIsLoading] = useState(true);
+  const [data, setData] = useState([]);
+
+  const getActiveFaculties = async () => {
+    try {
+      const url = process.env.REACT_APP_API_URL + "admin.php";
+      const formData = new FormData();
+      formData.append("operation", "getActiveFaculties");
+      const res = await axios.post(url, formData);
+      console.log("res ni getActiveFaculties", res);
+      setData(res.data !== 0 ? res.data : []);
+    } catch (error) {
+      toast.error("Network Error");
+      console.log("LandingPage.jsx => getActiveFaculties(): ", error);
+    } finally {
+      setIsLoading(false);
+    }
+  }
 
   const [showAddFacultyModal, setShowAddFacultyModal] = useState(false);
   const handleOpenAddFacultyModal = () => setShowAddFacultyModal(true);
   const handleCloseAddFacultyModal = () => {
+    getActiveFaculties();
     setShowAddFacultyModal(false)
   };
+
+
+
+  useEffect(() => {
+    getActiveFaculties();
+  }, [])
+
   return (
-    <Container className='mt-3'>
-      <Button onClick={handleOpenAddFacultyModal}>Add Faculty</Button>
-      <div className='d-flex justify-content-center align-items-center'>
-        <h1>Admin Dashboard</h1>
-      </div>
-      <AddFacultyModal 
+    <div>
+      <AdminNavbar />
+      <Container className='mt-3'>
+        <Button onClick={handleOpenAddFacultyModal}>Add Faculty</Button>
+        <div className='d-flex justify-content-center align-items-center'>
+          {isLoading ? <Spinner animation="border" variant="dark" size="sm" /> :
+            <Row className="g-3">
+              {data.map((faculty, index) => (
+                <Col xs={12} md={3} key={index} className="d-flex">
+                  <Card className="text-center p-3 mt-3 h-100 w-100" variant="dark">
+                    <div className="d-flex justify-content-center">
+                      <Card.Img
+                        variant="top"
+                        src={process.env.REACT_APP_API_URL + "images/" + faculty.user_image}
+                        className="rounded-circle"
+                        style={{
+                          width: "150px",
+                          height: "150px",
+                          objectFit: "cover"
+                        }}
+                      />
+                    </div>
+                    <Card.Body className="d-flex flex-column justify-content-between">
+                      <Card.Title>{`${faculty.user_firstName} ${faculty.user_lastName}`}</Card.Title>
+                    </Card.Body>
+                  </Card>
+                </Col>
+              ))}
+            </Row>
+
+
+          }
+        </div>
+
+      </Container>
+      <AddFacultyModal
         show={showAddFacultyModal}
         onHide={handleCloseAddFacultyModal}
-        // onAddFaculty={handleOpenAddFacultyModal}
       />
-    </Container>
+    </div>
   )
 }
