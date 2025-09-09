@@ -2,6 +2,7 @@ import { Toaster } from "sonner";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { LandingPage } from "./pages/LandingPage";
 import { FacultyDashboard } from "./pages/Faculty/FacultyDashboard";
+import { AdminDashboard } from "./pages/Admin/AdminDashboard";
 
 
 function App() {
@@ -14,6 +15,7 @@ function App() {
         <Routes>
           <Route path="/" element={<LandingPage />} />
           <Route path="/faculty/dashboard" element={<FacultyDashboard />} />
+          <Route path="/admin/dashboard" element={<AdminDashboard />} />
         </Routes>
       </BrowserRouter>
     </div>

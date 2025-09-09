@@ -24,7 +24,8 @@ export const Login = ({ show, onHide }) => {
         toast.success("Login Success");
         storeData("userId", res.data.user_id);
         setTimeout(() => {
-          navigateTo("/faculty/dashboard");
+          const url = res.data.user_level === 1 ? "/admin/dashboard" : "/faculty/dashboard";
+          navigateTo(url);
         }, 1500);
       } else {
         toast.error("Invalid Credentials");
