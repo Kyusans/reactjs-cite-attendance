@@ -10,6 +10,7 @@ import { AddSchedule } from "./modal/AddSchedule";
 import { Edit2, PlusSquare, Trash2 } from "lucide-react";
 import ChangeStatusAlert from "./modal/ChangeStatusAlert";
 import { UpdateSchedule } from "./modal/UpdateSchedule";
+import ShowAlert from "../../components/ShowAlert";
 
 export const FacultyDashboard = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -160,6 +161,47 @@ export const FacultyDashboard = () => {
     }
   }
 
+  const [showDeleteAlert, setShowDeleteAlert] = useState(false);
+  const [selectedId, setSelectedId] = useState(null);
+  const handleShowDeleteAlert = (message) => {
+    setAlertMessage(message);
+    setShowDeleteAlert(true);
+  };
+  const handleCloseDeleteAlert = (status) => {
+    if (status === 1) {
+      deleteSchedule();
+    }
+    setShowDeleteAlert(false);
+  };
+  const handleRemoveList = (id) => {
+    setSelectedId(id);
+    handleShowDeleteAlert("This action cannot be undone. It will permanently delete the item and remove it from your list");
+  };
+
+  const deleteSchedule = async () => {
+    setIsLoading(true);
+    try {
+      const url = process.env.REACT_APP_API_URL + "admin.php";
+      const jsonData = { sched_id: selectedId }
+      const formData = new FormData();
+      formData.append("json", JSON.stringify(jsonData));
+      formData.append("operation", "deleteSchedule");
+      const res = await axios.post(url, formData);
+      console.log("res ni deleteSchedule", res);
+      if (res.data !== 0) {
+        toast.success("Schedule successfully deleted");
+        getFacultySchedules();
+      } else {
+        toast.error("Unable to delete schedule");
+      }
+    } catch (error) {
+      toast.error("Network Error");
+      console.log("FacultyDashboard => deleteSchedule(): ", error);
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
   const columns = [
     { header: "Day", accessor: "sched_day", sortable: true },
     { header: "Start Time", accessor: "sched_startTime", sortable: true },
@@ -170,11 +212,10 @@ export const FacultyDashboard = () => {
       cell: (row) => (
         <div className="d-flex gap-2">
           <Edit2 className="cursor-pointer text-primary" onClick={() => handleOpenUpdateSched(row)} />
-          <Trash2 className="cursor-pointer text-danger" /* onClick={() => delete...} */ />
+          <Trash2 className="cursor-pointer text-danger" onClick={() => handleRemoveList(row.sched_id)} />
         </div>
       )
     }
-
   ]
 
   useEffect(() => {
@@ -277,12 +318,12 @@ export const FacultyDashboard = () => {
           }
           <ChangeStatusAlert open={showAlert} onHide={handleCloseAlert} duration={1} message={alertMessage} status={selectedStatus} />
           <AddSchedule open={showAddSched} onHide={handleCloseAddSched} />
-          <UpdateSchedule  
+          <UpdateSchedule
             open={showUpdateSched}
             onHide={handleCloseUpdateSched}
             schedule={selectedSchedule}
           />
-
+          <ShowAlert open={showDeleteAlert} onHide={handleCloseDeleteAlert} message={alertMessage} />
         </Container>
       </main>
     </>
