@@ -125,7 +125,7 @@ export const ViewFacultyProfile = ({ open, onHide, facultyId, facultyName, facul
                 />
               </Col>
               <Col xs={12} md={9}>
-                <h4>{facultyName}</h4>
+                <h4 className="text-center text-md-start">{facultyName}</h4>
                 {/* <Badge bg="success" className="p-2">
                   {currentStatus}
                 </Badge> */}
