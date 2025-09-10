@@ -46,6 +46,7 @@ export const FacultyDashboard = () => {
   };
 
   const handleShowSwitchStatusAlert = (value) => {
+    console.log("value", value);
     setSelectedStatus(value);
     handleShowAlert("You want to change the status?");
   };
@@ -76,16 +77,24 @@ export const FacultyDashboard = () => {
       console.log("status", selectedStatus);
       const url = process.env.REACT_APP_API_URL + "admin.php";
       const userId = retrieveData("userId");
-      const jsonData = { userId: userId, status: selectedStatus, notes: selectedStatus === 1 ? "In Office" : notes }
+      const jsonData = {
+        userId: userId,
+        status: selectedStatus,
+        notes: selectedStatus === 1 ? "In Office" : notes
+      }
       const formData = new FormData();
       formData.append("json", JSON.stringify(jsonData));
       formData.append("operation", "changeFacultyStatus");
       const res = await axios.post(url, formData);
+
       console.log("res ni handleChangeStatus", res);
 
       if (res.data !== 0) {
         toast.success("Status successfully changed");
-        getFacultySchedules();
+        // ✅ Always refetch after updating
+        await getFacultySchedules(); // <--- THIS refreshes facultyStatus from DB
+      } else {
+        toast.error("Unable to change status");
       }
     } catch (error) {
       toast.error("Network Error");
@@ -94,6 +103,7 @@ export const FacultyDashboard = () => {
       setIsLoading(false);
     }
   };
+
 
   const getFacultySchedules = async () => {
     setIsLoading(true);
@@ -113,6 +123,7 @@ export const FacultyDashboard = () => {
 
       const status = response.status !== 0 ? response.status[0] : null;
       setFacultyStatus(status);
+      console.log("statusssss", status);
 
       if (status) {
         setStatusSwitch(status.facStatus_statusMId === 1);
@@ -186,9 +197,21 @@ export const FacultyDashboard = () => {
                       <div className="d-flex align-items-center">
                         <Form.Check
                           type="switch"
-                          checked={statusSwitch}
-                          onChange={() => handleShowSwitchStatusAlert(!statusSwitch ? 1 : 2)}
+                          checked={
+                            facultyStatus &&
+                            (facultyStatus.facStatus_statusMId === 1 ||
+                              facultyStatus.facStatus_statusMId === 3)
+                          }
+                          onChange={() =>
+                            handleShowSwitchStatusAlert(
+                              facultyStatus.facStatus_statusMId === 1 ||
+                                facultyStatus.facStatus_statusMId === 3
+                                ? 2
+                                : facultyStatus.facStatus_statusMId
+                            )
+                          }
                         />
+
                         <Badge bg={
                           facultyStatus.facStatus_statusMId === 2
                             ? "danger"

@@ -10,6 +10,7 @@ function ChangeStatusAlert({ open, onHide, message, duration, status }) {
   useEffect(() => {
     let timer;
     if (open && duration) {
+      console.log("status", status);
       setCountdown(duration);
       setIsButtonDisabled(true);
       timer = setInterval(() => {
@@ -25,7 +26,7 @@ function ChangeStatusAlert({ open, onHide, message, duration, status }) {
     }
 
     return () => clearInterval(timer);
-  }, [open, duration]);
+  }, [open, duration, status]);
 
   const handleClose = () => {
     onHide(0, notes);
