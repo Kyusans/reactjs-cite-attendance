@@ -4,6 +4,8 @@ import { AddFacultyModal } from './modal/AddFacultyModal';
 import { AdminNavbar } from './AdminNavbar';
 import axios from 'axios';
 import { toast } from 'sonner';
+import { Plus } from 'lucide-react';
+import { ViewFacultyProfile } from '../modal/ViewFacultyProfile';
 
 export const AdminDashboard = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -25,6 +27,7 @@ export const AdminDashboard = () => {
     }
   }
 
+  // add faculty diri
   const [showAddFacultyModal, setShowAddFacultyModal] = useState(false);
   const handleOpenAddFacultyModal = () => setShowAddFacultyModal(true);
   const handleCloseAddFacultyModal = () => {
@@ -32,6 +35,21 @@ export const AdminDashboard = () => {
     setShowAddFacultyModal(false)
   };
 
+  // view faculty diri
+  const [facultyId, setFacultyId] = useState(0);
+  const [facultyName, setFacultyName] = useState('');
+  const [facultyImage, setFacultyImage] = useState('');
+  const [showViewFacultyModal, setShowViewFacultyModal] = useState(false);
+  const handleOpenViewFacultyModal = (facultyId, facultyName, facultyImage) => {
+    setFacultyId(facultyId);
+    setFacultyName(facultyName);
+    setFacultyImage(facultyImage);
+    setShowViewFacultyModal(true);
+  };
+  const handleCloseViewFacultyModal = () => {
+    getActiveFaculties();
+    setShowViewFacultyModal(false)
+  };
 
 
   useEffect(() => {
@@ -42,11 +60,11 @@ export const AdminDashboard = () => {
     <div>
       <AdminNavbar />
       <Container className='mt-3'>
-        <Button onClick={handleOpenAddFacultyModal}>Add Faculty</Button>
+        <Button variant='outline-success' onClick={handleOpenAddFacultyModal}><Plus size={16} /> Add Faculty</Button>
         <div className='d-flex justify-content-center align-items-center'>
           {isLoading ? <Spinner animation="border" variant="dark" size="sm" /> :
             <Row className="g-3">
-              {data.map((faculty, index) => (
+              {data.length === 0 ? <h1>No Faculties</h1> : data.map((faculty, index) => (
                 <Col xs={12} md={3} key={index} className="d-flex">
                   <Card className="text-center p-3 mt-3 h-100 w-100" variant="dark">
                     <div className="d-flex justify-content-center">
@@ -63,6 +81,17 @@ export const AdminDashboard = () => {
                     </div>
                     <Card.Body className="d-flex flex-column justify-content-between">
                       <Card.Title>{`${faculty.user_firstName} ${faculty.user_lastName}`}</Card.Title>
+                      <Button
+                        variant="outline-primary"
+                        onClick={() => handleOpenViewFacultyModal(
+                          faculty.user_id,
+                          faculty.user_firstName + " " + faculty.user_lastName,
+                          faculty.user_image
+                        )
+                        }
+                      >
+                        View Profile
+                      </Button>
                     </Card.Body>
                   </Card>
                 </Col>
@@ -77,6 +106,13 @@ export const AdminDashboard = () => {
       <AddFacultyModal
         show={showAddFacultyModal}
         onHide={handleCloseAddFacultyModal}
+      />
+      <ViewFacultyProfile
+        open={showViewFacultyModal}
+        onHide={handleCloseViewFacultyModal}
+        facultyId={facultyId}
+        facultyName={facultyName}
+        facultyImage={facultyImage}
       />
     </div>
   )
