@@ -9,6 +9,7 @@ import DataTable from "../../components/DataTable";
 import { AddSchedule } from "./modal/AddSchedule";
 import { Edit2, PlusSquare, Trash2 } from "lucide-react";
 import ChangeStatusAlert from "./modal/ChangeStatusAlert";
+import { UpdateSchedule } from "./modal/UpdateSchedule";
 
 export const FacultyDashboard = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -49,6 +50,18 @@ export const FacultyDashboard = () => {
     console.log("value", value);
     setSelectedStatus(value);
     handleShowAlert("You want to change the status?");
+  };
+
+  const [showUpdateSched, setShowUpdateSched] = useState(false);
+  const [selectedSchedule, setSelectedSchedule] = useState(null);
+
+  const handleOpenUpdateSched = (row) => {
+    setSelectedSchedule(row);
+    setShowUpdateSched(true);
+  };
+  const handleCloseUpdateSched = () => {
+    getFacultySchedules();
+    setShowUpdateSched(false);
   };
 
   const getFacultyProfile = async () => {
@@ -152,13 +165,16 @@ export const FacultyDashboard = () => {
     { header: "Start Time", accessor: "sched_startTime", sortable: true },
     { header: "End Time", accessor: "sched_endTime", sortable: true },
     {
-      header: "Actions", accessor: "actions", cell: (row) => (
+      header: "Actions",
+      accessor: "actions",
+      cell: (row) => (
         <div className="d-flex gap-2">
-          <Edit2 />
-          <Trash2 />
+          <Edit2 className="cursor-pointer text-primary" onClick={() => handleOpenUpdateSched(row)} />
+          <Trash2 className="cursor-pointer text-danger" /* onClick={() => delete...} */ />
         </div>
       )
     }
+
   ]
 
   useEffect(() => {
@@ -182,11 +198,11 @@ export const FacultyDashboard = () => {
                         width={150}
                         height={150}
                         roundedCircle
-                        className={`border border-3 border-dark`}
                       />
                     </Col>
                     <Col xs={12} md={9}>
                       <h4 className="text-center text-md-start">{facultyProfile.user_firstName} {facultyProfile.user_lastName}</h4>
+                      <h6 className="text-center text-md-start text-muted">{facultyProfile.user_email}</h6>
                       {/* <Badge bg="success" className="p-2">
                   {currentStatus}
                 </Badge> */}
@@ -207,7 +223,7 @@ export const FacultyDashboard = () => {
                               facultyStatus.facStatus_statusMId === 1 ||
                                 facultyStatus.facStatus_statusMId === 3
                                 ? 2
-                                : facultyStatus.facStatus_statusMId
+                                : 1
                             )
                           }
                         />
@@ -261,6 +277,12 @@ export const FacultyDashboard = () => {
           }
           <ChangeStatusAlert open={showAlert} onHide={handleCloseAlert} duration={1} message={alertMessage} status={selectedStatus} />
           <AddSchedule open={showAddSched} onHide={handleCloseAddSched} />
+          <UpdateSchedule  
+            open={showUpdateSched}
+            onHide={handleCloseUpdateSched}
+            schedule={selectedSchedule}
+          />
+
         </Container>
       </main>
     </>
