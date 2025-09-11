@@ -12,6 +12,7 @@ import ChangeStatusAlert from "./modal/ChangeStatusAlert";
 import { UpdateSchedule } from "./modal/UpdateSchedule";
 import ShowAlert from "../../components/ShowAlert";
 import { ChangeProfilePicture } from "./modal/ChangeProfilePicture";
+import { UpdateFacultyProfile } from "./modal/UpdateFacultyProfile";
 
 export const FacultyDashboard = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -34,9 +35,16 @@ export const FacultyDashboard = () => {
   const handleOpenChangeProfile = () => {
     setShowChangeProfile(true)
   };
-  const handleCloseChangeProfile = () => { 
+  const handleCloseChangeProfile = () => {
     getFacultyProfile();
-    setShowChangeProfile(false) 
+    setShowChangeProfile(false)
+  };
+
+  const [showUpdateProfile, setShowUpdateProfile] = useState(false);
+  const handleOpenUpdateProfile = () => setShowUpdateProfile(true);
+  const handleCloseUpdateProfile = () => {
+    getFacultyProfile();
+    setShowUpdateProfile(false)
   };
 
   const [alertMessage, setAlertMessage] = useState("");
@@ -304,7 +312,7 @@ export const FacultyDashboard = () => {
                       <div className="text-center text-md-start mt-2">
                         <Button
                           size="sm"
-                          onClick={() => console.log("Edit profile clicked")}
+                          onClick={handleOpenUpdateProfile}
                         >
                           Edit Profile
                         </Button>
@@ -386,9 +394,14 @@ export const FacultyDashboard = () => {
             onHide={handleCloseUpdateSched}
             schedule={selectedSchedule}
           />
-          <ChangeProfilePicture 
-          show={showChangeProfile} 
-          onHide={handleCloseChangeProfile} 
+          <ChangeProfilePicture
+            show={showChangeProfile}
+            onHide={handleCloseChangeProfile}
+          />
+          <UpdateFacultyProfile
+            show={showUpdateProfile}
+            onHide={handleCloseUpdateProfile}
+            faculty={facultyProfile}
           />
           <ShowAlert open={showDeleteAlert} onHide={handleCloseDeleteAlert} message={alertMessage} />
         </Container>
