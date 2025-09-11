@@ -1,6 +1,14 @@
 import axios from "axios";
 import React, { useCallback, useMemo } from "react";
-import { Button, Col, Container, Image, Modal, Row, Spinner } from "react-bootstrap";
+import {
+  Button,
+  Col,
+  Container,
+  Image,
+  Modal,
+  Row,
+  Spinner,
+} from "react-bootstrap";
 import { toast } from "sonner";
 import { Calendar, dateFnsLocalizer } from "react-big-calendar";
 import { format, parse, startOfWeek, getDay } from "date-fns";
@@ -17,7 +25,13 @@ const localizer = dateFnsLocalizer({
   locales,
 });
 
-export const ViewFacultyProfile = ({ open, onHide, facultyId, facultyName, facultyImage }) => {
+export const ViewFacultyProfile = ({
+  open,
+  onHide,
+  facultyId,
+  facultyName,
+  facultyImage,
+}) => {
   const [isLoading, setIsLoading] = React.useState(false);
   const [data, setData] = React.useState({ schedules: [], status: [] });
   const [liveDateTime, setLiveDateTime] = React.useState("");
@@ -57,7 +71,7 @@ export const ViewFacultyProfile = ({ open, onHide, facultyId, facultyName, facul
       const now = new Date();
       const options = {
         timeZone: "Asia/Manila",
-        weekday: "long",   // ✅ shows day (e.g., Wednesday)
+        weekday: "long",
         year: "numeric",
         month: "long",
         day: "numeric",
@@ -68,11 +82,10 @@ export const ViewFacultyProfile = ({ open, onHide, facultyId, facultyName, facul
       setLiveDateTime(new Intl.DateTimeFormat("en-PH", options).format(now));
     };
 
-    updateTime(); // run immediately
-    const timer = setInterval(updateTime, 1000); // update every second
+    updateTime();
+    const timer = setInterval(updateTime, 1000);
     return () => clearInterval(timer);
   }, []);
-
 
   // Convert JSON schedules into events for calendar
   const events = useMemo(() => {
@@ -103,32 +116,36 @@ export const ViewFacultyProfile = ({ open, onHide, facultyId, facultyName, facul
     });
   }, [data.schedules]);
 
-  // const currentStatus = data.status?.[0]?.facStatus_note || "No Status";
-
   return (
-    <Modal show={open} onHide={handleClose} size="xl" centered>
+    <Modal
+      show={open}
+      onHide={handleClose}
+      fullscreen // ✅ Fullscreen on mobile
+      centered
+    >
       <Modal.Body>
         {isLoading ? (
-          <div className="d-flex justify-content-center align-items-center" style={{ minHeight: "200px" }}>
+          <div
+            className="d-flex justify-content-center align-items-center"
+            style={{ minHeight: "200px" }}
+          >
             <Spinner animation="border" variant="dark" />
           </div>
         ) : (
           <Container fluid>
             {/* Profile Section */}
             <Row className="align-items-center mb-3">
-              <Col xs={12} md={3} className="text-center">
+              <Col xs={12} md={3} className="text-center mb-3 mb-md-0">
                 <Image
                   src={process.env.REACT_APP_API_URL + "images/" + facultyImage}
                   width={150}
                   height={150}
                   roundedCircle
+                  style={{ objectFit: "cover" }}
                 />
               </Col>
               <Col xs={12} md={9}>
                 <h4 className="text-center text-md-start">{facultyName}</h4>
-                {/* <Badge bg="success" className="p-2">
-                  {currentStatus}
-                </Badge> */}
               </Col>
             </Row>
 
@@ -136,27 +153,31 @@ export const ViewFacultyProfile = ({ open, onHide, facultyId, facultyName, facul
             <h4>Class Schedule</h4>
             <p className="text-muted mb-1">📅 {liveDateTime}</p>
 
-            <Calendar
-              localizer={localizer}
-              events={events}
-              startAccessor="start"
-              endAccessor="end"
-              style={{ height: 500 }}
-              views={["week"]}
-              defaultView="week"
-              toolbar={false}
-              min={new Date(1970, 1, 1, 8, 0)} // 8:00 AM
-              max={new Date(1970, 1, 1, 21, 0)} // 9:00 PM
-              eventPropGetter={() => ({
-                style: {
-                  backgroundColor: "#f0ad4e",
-                  borderRadius: "6px",
-                  color: "white",
-                  border: "none",
-                  padding: "4px",
-                },
-              })}
-            />
+            <div style={{ overflowX: "auto" }}>
+              <div style={{ minWidth: "700px" }}>
+                <Calendar
+                  localizer={localizer}
+                  events={events}
+                  startAccessor="start"
+                  endAccessor="end"
+                  style={{ height: 500 }}
+                  views={["week"]}
+                  defaultView="week"
+                  toolbar={false}
+                  min={new Date(1970, 1, 1, 8, 0)} // 8:00 AM
+                  max={new Date(1970, 1, 1, 21, 0)} // 9:00 PM
+                  eventPropGetter={() => ({
+                    style: {
+                      backgroundColor: "#f0ad4e",
+                      borderRadius: "6px",
+                      color: "white",
+                      border: "none",
+                      padding: "4px",
+                    },
+                  })}
+                />
+              </div>
+            </div>
           </Container>
         )}
       </Modal.Body>
