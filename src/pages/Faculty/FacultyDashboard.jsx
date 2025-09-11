@@ -11,6 +11,7 @@ import { Edit2, PlusSquare, Trash2 } from "lucide-react";
 import ChangeStatusAlert from "./modal/ChangeStatusAlert";
 import { UpdateSchedule } from "./modal/UpdateSchedule";
 import ShowAlert from "../../components/ShowAlert";
+import { ChangeProfilePicture } from "./modal/ChangeProfilePicture";
 
 export const FacultyDashboard = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -27,6 +28,15 @@ export const FacultyDashboard = () => {
   const handleCloseAddSched = () => {
     getFacultySchedules();
     setShowAddSched(false)
+  };
+
+  const [showChangeProfile, setShowChangeProfile] = useState(false);
+  const handleOpenChangeProfile = () => {
+    setShowChangeProfile(true)
+  };
+  const handleCloseChangeProfile = () => { 
+    getFacultyProfile();
+    setShowChangeProfile(false) 
   };
 
   const [alertMessage, setAlertMessage] = useState("");
@@ -46,6 +56,7 @@ export const FacultyDashboard = () => {
     }
     setShowAlert(false);
   };
+
 
   const handleShowSwitchStatusAlert = (value) => {
     console.log("value", value);
@@ -234,20 +245,72 @@ export const FacultyDashboard = () => {
                 <Card.Body>
                   <Row className="align-items-center mb-3">
                     <Col xs={12} md={3} className="text-center">
-                      <Image
-                        src={`${process.env.REACT_APP_API_URL}images/${facultyProfile.user_image}`}
-                        width={150}
-                        height={150}
-                        roundedCircle
-                      />
+                      <div
+                        style={{
+                          position: "relative",
+                          width: "150px",
+                          height: "150px",
+                          margin: "0 auto",
+                          borderRadius: "50%",
+                          overflow: "hidden",
+                        }}
+                        // parent hover triggers overlay opacity
+                        onMouseEnter={(e) =>
+                          e.currentTarget.querySelector(".overlay").style.opacity = "1"
+                        }
+                        onMouseLeave={(e) =>
+                          e.currentTarget.querySelector(".overlay").style.opacity = "0"
+                        }
+                      >
+                        <Image
+                          src={`${process.env.REACT_APP_API_URL}images/${facultyProfile.user_image}`}
+                          roundedCircle
+                          width={150}
+                          height={150}
+                          style={{ objectFit: "cover" }}
+                        />
+                        <div
+                          className="overlay d-flex align-items-center justify-content-center"
+                          style={{
+                            position: "absolute",
+                            top: 0,
+                            left: 0,
+                            width: "100%",
+                            height: "100%",
+                            backgroundColor: "rgba(0,0,0,0.6)",
+                            color: "#fff",
+                            fontSize: "14px",
+                            fontWeight: "bold",
+                            borderRadius: "50%",
+                            opacity: 0,
+                            transition: "opacity 0.3s ease",
+                            cursor: "pointer",
+                          }}
+                          onClick={handleOpenChangeProfile}
+                        >
+                          Change Profile Picture
+                        </div>
+                      </div>
                     </Col>
+
+
                     <Col xs={12} md={9}>
-                      <h4 className="text-center text-md-start">{facultyProfile.user_firstName} {facultyProfile.user_lastName}</h4>
-                      <h6 className="text-center text-md-start text-muted">{facultyProfile.user_email}</h6>
-                      {/* <Badge bg="success" className="p-2">
-                  {currentStatus}
-                </Badge> */}
+                      <h4 className="text-center text-md-start">
+                        {facultyProfile.user_firstName} {facultyProfile.user_lastName}
+                      </h4>
+                      <h6 className="text-center text-md-start text-muted">
+                        {facultyProfile.user_email}
+                      </h6>
+                      <div className="text-center text-md-start mt-2">
+                        <Button
+                          size="sm"
+                          onClick={() => console.log("Edit profile clicked")}
+                        >
+                          Edit Profile
+                        </Button>
+                      </div>
                     </Col>
+
                   </Row>
                   <div>
                     {facultyStatus && (
@@ -322,6 +385,10 @@ export const FacultyDashboard = () => {
             open={showUpdateSched}
             onHide={handleCloseUpdateSched}
             schedule={selectedSchedule}
+          />
+          <ChangeProfilePicture 
+          show={showChangeProfile} 
+          onHide={handleCloseChangeProfile} 
           />
           <ShowAlert open={showDeleteAlert} onHide={handleCloseDeleteAlert} message={alertMessage} />
         </Container>
