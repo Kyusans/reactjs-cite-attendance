@@ -20,7 +20,7 @@ export const AdminNavbar = () => {
   };
 
   return (
-    <Navbar bg="dark" expand="lg" className="mb-3">
+    <Navbar bg="success" expand="lg" className="mb-3">
       <Navbar.Brand className="text-white ms-3">CITE</Navbar.Brand>
 
       <Navbar.Toggle aria-controls="basic-navbar-nav" className="border-0">
@@ -29,9 +29,11 @@ export const AdminNavbar = () => {
 
       <Navbar.Collapse className="justify-content-end">
         {isMobile ? (
-          <Button variant="outline-light" className="me-3 d-flex align-items-center" onClick={handleLogout}>
-            <LogOut size={16} className="me-1" /> Logout
-          </Button>
+          <div className='m-2'>
+            <div className="me-3 d-flex align-items-center text-white" onClick={handleLogout}>
+              <LogOut size={16} className="me-1" /> Logout
+            </div>
+          </div>
         ) : (
           <Dropdown drop="start" className="me-3">
             <Dropdown.Toggle variant="outline-light" id="dropdown-basic">

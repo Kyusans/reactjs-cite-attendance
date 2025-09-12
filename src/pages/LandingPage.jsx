@@ -66,7 +66,7 @@ export const LandingPage = () => {
   return (
     <>
       {/* NAVBAR */}
-      <Navbar bg="dark" expand="lg" className="mb-3">
+      <Navbar bg="success" expand="lg" className="mb-3">
         <Navbar.Brand className="ms-3 text-white">CITE</Navbar.Brand>
         <Button
           size="sm"

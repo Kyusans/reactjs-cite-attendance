@@ -40,7 +40,7 @@ export const AddFacultyModal = ({ show, onHide }) => {
     const lastName = document.getElementById('lastName').value;
     const email = document.getElementById('email').value;
     const schoolId = document.getElementById('schoolId').value;
-    const password = document.getElementById('password').value;
+    // const password = document.getElementById('password').value;
 
     try {
       const jsonData = {
@@ -49,7 +49,7 @@ export const AddFacultyModal = ({ show, onHide }) => {
         lastName,
         email,
         schoolId,
-        password,
+        // password,
         // 👇 fallback if no image uploaded
         image: image ? image.name : "emptyImage.jpg"
       };
@@ -167,11 +167,12 @@ export const AddFacultyModal = ({ show, onHide }) => {
             <Form.Label>School ID<span className='text-danger'>*</span></Form.Label>
             <Form.Control type="text" id="schoolId" required />
           </Form.Group>
-
+          {/* 
           <Form.Group>
             <Form.Label>Password<span className='text-danger'>*</span></Form.Label>
             <Form.Control type="password" id="password" required />
-          </Form.Group>
+          </Form.Group> */}
+          <h6 className='text-muted mt-3'>Password is <span className="font-weight-bold">School ID + Last Name</span></h6>
 
 
         </Modal.Body>
